@@ -225,3 +225,4 @@ import { mutateItinerary } from "./generateItinerary";
 const newVersion = await mutateItinerary(oldItinerary);
 📄 License
 MIT License.
+# TravelPlanner
