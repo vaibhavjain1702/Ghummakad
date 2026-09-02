@@ -2,8 +2,6 @@
 
 A pure-Python, AI-powered travel itinerary planner that generates optimized, constraint-safe day-wise trip plans using **fuzzy logic**, **CSP**, **A\*** state-space search, **genetic mutation**, and the **Gemini API** — served by **FastAPI** with a vanilla-JS frontend.
 
-> ℹ️ This project was migrated from React + TypeScript to a pure Python backend with full behavioral parity (identical algorithms, prompts, and output shapes).
-
 ---
 
 ## 🌟 Overview
@@ -108,16 +106,10 @@ Then open **http://localhost:3000**
 
 ---
 
-## 📝 License
-
-MIT — see [LICENSE](LICENSE) if present.
-
----
-
-## 🏗 Architecture
+## � Project Structure
 
 ```
-TravelPlanner/
+Ghummakad/
 ├── main.py               # FastAPI app: routes, Jinja2 templating, uvicorn entrypoint
 ├── models.py             # Pydantic data layer (preferences, itinerary, reasoning)
 ├── planner.py            # Fuzzy logic · CSP solver · A* search · mutation · state vector
@@ -129,5 +121,11 @@ TravelPlanner/
     ├── app.js            # Form handling, API calls, state management
     └── ui.js             # Rendering: itinerary, reasoning panel, cards
 ```
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
 
 Request flow: **UI → FastAPI → gemini_service (Gemini fetch) → planner (fuzzy → CSP filter → per-day A* → assembly) → JSON response → vanilla-JS renderer**
