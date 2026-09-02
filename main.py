@@ -76,5 +76,6 @@ async def api_remix(body: dict):
 if __name__ == "__main__":
     import uvicorn
 
-    # Port/host parity with the old vite.config.ts dev server.
-    uvicorn.run(app, host="0.0.0.0", port=3000)
+    # Railway/most PaaS inject PORT; locally default to 3000 for dev parity.
+    port = int(os.environ.get("PORT", "3000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
