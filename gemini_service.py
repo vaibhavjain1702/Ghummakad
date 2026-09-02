@@ -184,15 +184,33 @@ Return ONLY valid JSON matching the schema with NO markdown formatting.
 
     content_parts.append({"text": data_prompt})
 
-    response = await client.aio.models.generate_content(
-        model=MODEL_NAME,
-        contents=[{"parts": content_parts}],
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=ITINERARY_SCHEMA,
-            temperature=0.7,
-        ),
-    )
+    # Retry on 503 UN AVAILABLE (rate limit) with exponential backoff
+    import asyncio
+    response = None
+    last_error = None
+    for attempt in range(4):
+        try:
+            response = await client.aio.models.generate_content(
+                model=MODEL_NAME,
+                contents=[{"parts": content_parts}],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=ITINERARY_SCHEMA,
+                    temperature=0.7,
+                ),
+            )
+            break
+        except Exception as e:
+            last_error = e
+            err_str = str(e)
+            if "503" in err_str or "UNAVAILABLE" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                wait = 2 ** attempt  # 1s, 2s, 4s, 8s
+                print(f"Gemini rate-limited (attempt {attempt + 1}/4), retrying in {wait}s...")
+                await asyncio.sleep(wait)
+                continue
+            raise
+    if response is None:
+        raise last_error
 
     raw_data = _parse_ai_json(response.text or "")
     parsed = GeminiResponse.model_validate(raw_data)
@@ -394,15 +412,33 @@ async def mutate_itinerary(current_itinerary: Dict[str, Any]) -> Dict[str, Any]:
         f"where these activities are: {destination}. Return raw activities data only."
     )
 
-    response = await client.aio.models.generate_content(
-        model=MODEL_NAME,
-        contents=data_prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=ITINERARY_SCHEMA,
-            temperature=0.9,
-        ),
-    )
+    # Retry on 503/UNAVAILABLE (rate limit) with exponential backoff
+    import asyncio
+    response = None
+    last_error = None
+    for attempt in range(4):
+        try:
+            response = await client.aio.models.generate_content(
+                model=MODEL_NAME,
+                contents=data_prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=ITINERARY_SCHEMA,
+                    temperature=0.9,
+                ),
+            )
+            break
+        except Exception as e:
+            last_error = e
+            err_str = str(e)
+            if "503" in err_str or "UNAVAILABLE" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                wait = 2 ** attempt
+                print(f"Gemini rate-limited (attempt {attempt + 1}/4), retrying in {wait}s...")
+                await asyncio.sleep(wait)
+                continue
+            raise
+    if response is None:
+        raise last_error
 
     raw_data = _parse_ai_json(response.text or "")
     parsed = GeminiResponse.model_validate(raw_data)
