@@ -76,6 +76,6 @@ async def api_remix(body: dict):
 if __name__ == "__main__":
     import uvicorn
 
-    # Railway/most PaaS inject PORT; locally default to 3000 for dev parity.
+    # Railway / Render / Fly assign PORT dynamically; fall back to 3000 for local dev.
     port = int(os.environ.get("PORT", "3000"))
     uvicorn.run(app, host="0.0.0.0", port=port)
