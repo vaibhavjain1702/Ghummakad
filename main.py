@@ -48,7 +48,11 @@ templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 @app.get("/")
 async def index(request: Request):
     """Render the self-contained frontend page."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={},
+    )
 
 
 @app.post("/api/generate")
