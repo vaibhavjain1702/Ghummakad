@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intelligent Travel Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: 0, transform: 'translateY(10px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' },
+              },
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-slate-900 text-slate-100 font-sans">
+    <div class="min-h-screen bg-slate-900 text-slate-100 p-4 sm:p-6 lg:p-8">
+      <div class="max-w-7xl mx-auto">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+          <div class="inline-flex items-center gap-4">
+            <span id="header-icon"></span>
+            <h1 class="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Intelligent Travel Planner
+            </h1>
+          </div>
+          <p class="mt-4 text-lg text-slate-400 max-w-2xl mx-auto">
+            Powered by Gemini, Fuzzy Logic, CSP &amp; Genetic Algorithms
+          </p>
+        </header>
+
+        <!-- Main grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+          <!-- Left panel: Form -->
+          <div class="lg:col-span-4 xl:col-span-3">
+            <form id="preferences-form" class="bg-slate-800/50 rounded-xl shadow-lg p-6 space-y-6 border border-slate-700 sticky top-8">
+
+              <!-- Trip Type -->
+              <div>
+                <h3 class="text-sm font-medium text-slate-300 mb-2">Trip Type</h3>
+                <div id="trip-type-toggle" class="grid grid-cols-2 gap-2">
+                  <button type="button" data-trip-type="activitiesOnly" class="px-3 py-2 text-sm rounded-md transition-colors duration-200 bg-indigo-500 text-white">Activities Only</button>
+                  <button type="button" data-trip-type="fullTrip" class="px-3 py-2 text-sm rounded-md transition-colors duration-200 bg-slate-700 hover:bg-slate-600 text-slate-300">Full Trip</button>
+                </div>
+              </div>
+
+              <!-- Origin (visible only for Full Trip) -->
+              <div id="origin-field" class="hidden animate-fade-in">
+                <label for="origin" class="block text-sm font-medium text-slate-300 mb-1">Origin</label>
+                <input type="text" name="origin" id="origin" value="New York, USA" required placeholder="e.g., London, UK" class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 focus:ring-indigo-500 focus:border-indigo-500" />
+              </div>
+
+              <!-- Destination -->
+              <div>
+                <label for="destination" class="block text-sm font-medium text-slate-300 mb-1">Destination</label>
+                <input type="text" name="destination" id="destination" value="Paris, France" required placeholder="e.g., Tokyo, Japan" class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 focus:ring-indigo-500 focus:border-indigo-500" />
+              </div>
+
+              <!-- Accommodation Area -->
+              <div>
+                <label for="startLocation" class="block text-sm font-medium text-slate-300 mb-1">Accommodation Area</label>
+                <input type="text" name="startLocation" id="startLocation" value="Near the Louvre Museum" required placeholder="e.g., Hotel name or area" class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p class="text-xs text-slate-500 mt-1">For 'Full Trip', the AI will recommend a hotel and use it as the starting point.</p>
+              </div>
+
+              <!-- Dates -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="startDate" class="block text-sm font-medium text-slate-300 mb-1">Start Date</label>
+                  <input type="date" name="startDate" id="startDate" required class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label for="endDate" class="block text-sm font-medium text-slate-300 mb-1">End Date</label>
+                  <input type="date" name="endDate" id="endDate" required class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+              </div>
+
+              <!-- Budget -->
+              <div>
+                <label for="budget" id="budget-label" class="block text-sm font-medium text-slate-300 mb-1">Daily Budget (USD per person)</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">$</div>
+                  <input type="number" name="budget" id="budget" value="150" required min="0" placeholder="100" class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 pl-7 focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+              </div>
+
+              <!-- Interests -->
+              <div>
+                <h3 class="text-sm font-medium text-slate-300 mb-2">Interests</h3>
+                <div id="interests-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+              </div>
+
+              <!-- Must-Visit Places -->
+              <div>
+                <label for="mustVisit" class="block text-sm font-medium text-slate-300 mb-1">Must-Visit Places <span class="text-xs text-slate-500">(Optional)</span></label>
+                <input type="text" name="mustVisit" id="mustVisit" value="" placeholder="e.g., Tokyo Tower, Shibuya Crossing" class="w-full bg-slate-700 border-slate-600 rounded-md shadow-sm text-slate-100 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p class="text-xs text-slate-500 mt-1">Prioritized constraints for State Space Search.</p>
+              </div>
+
+              <!-- Pace -->
+              <div>
+                <h3 class="text-sm font-medium text-slate-300 mb-2">Pace</h3>
+                <div id="pace-toggle" class="grid grid-cols-3 gap-2">
+                  <button type="button" data-pace="Relaxed" class="px-3 py-2 text-sm rounded-md transition-colors duration-200 bg-slate-700 hover:bg-slate-600 text-slate-300">Relaxed</button>
+                  <button type="button" data-pace="Moderate" class="px-3 py-2 text-sm rounded-md transition-colors duration-200 bg-indigo-500 text-white">Moderate</button>
+                  <button type="button" data-pace="Fast-paced" class="px-3 py-2 text-sm rounded-md transition-colors duration-200 bg-slate-700 hover:bg-slate-600 text-slate-300">Fast-paced</button>
+                </div>
+              </div>
+
+              <!-- Inspiration Image -->
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">
+                  Computer Vision: Inspiration Image
+                  <span class="block text-xs text-slate-500 font-normal">Upload an image of a place you love, and the AI will analyze its vibe.</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="inspirationImage"
+                  class="block w-full text-sm text-slate-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-indigo-900/50 file:text-indigo-300
+                    hover:file:bg-indigo-900/70"
+                />
+                <p class="mt-2 text-xs hidden" id="image-status"></p>
+              </div>
+
+              <!-- Submit -->
+              <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-900/50 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                Generate Itinerary
+              </button>
+            </form>
+          </div>
+
+          <!-- Right panel: Results -->
+          <div class="lg:col-span-8 xl:col-span-9">
+            <div id="results-panel" class="bg-slate-800/50 rounded-xl shadow-lg p-6 min-h-full border border-slate-700"></div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <script src="/static/ui.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
