@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ghummakad
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python3 main.py"
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+    healthCheckPath: /
+    autoDeploy: true
